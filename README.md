@@ -23,7 +23,7 @@ License MIT
 
 * This library is testing only ESP-WROOM-02/32(ESP8266/ESP32) boards. if you can't execute this library on your arduino (or clone) boards, please contact me.
 
-* The Sensor works better with UART protocol, thorugh pwm can only read values.
+* The Sensor through PWM can only implement getPPM(MHZ19_POTOCOL::PWM), so in order to use all the functionalities use UART protocol.
 
 # MHZ19 library function
 
