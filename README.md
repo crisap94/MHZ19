@@ -1,4 +1,4 @@
-# MHZ19_uart 
+# MHZ19 
 Arduino IDE library for operating the MH-Z19 CO2 sensor in ESP-WROOM-02/32(ESP8266/ESP32) or Arduino  
 version 0.3
 
@@ -15,25 +15,30 @@ License MIT
     MH-Z19 Tx   to Arduino Digital Pin (Serial Rx pin)  
     MH-Z19 Rx   to Arduino Digital Pin (Serial Tx pin)  
     other MH-Z19 pins are not used.  
-
+    
+* Wiring the MH-Z19 through PWM use a PWM pin from your Arduino,ESP8266 or ESP32
 * Read sample source code. It's very simple !
 
 # caution
 
-* MH-Z19 is supporting PWM , but this library is supporting only serial connection. 
-* this library is testing only ESP-WROOM-02/32(ESP8266/ESP32) boards. if you can't execute this library on your arduino (or clone) boards, please contact me.
+* This library is testing only ESP-WROOM-02/32(ESP8266/ESP32) boards. if you can't execute this library on your arduino (or clone) boards, please contact me.
 
-# MHZ19_uart library function
+* The Sensor works better with UART protocol, thorugh pwm can only read values.
+
+# MHZ19 library function
 
 ## Constractor
 
-* MHZ19_uart  
+* MHZ19  
   normal constractor. if you use this constractor, you must execute begin() function after this constractor execute.
 
-* MHZ19_uart(int rx, int tx)  
+* MHZ19(int rx, int tx)  
   setting rx and tx pin, and initialize Software Serial.
+  
+* MHZ19(int pwm_pin)
+  settings pwm pin.
 
-## public function
+## public function for UART
 
 * void begin(int rx, int tx)  
   setting rx and tx pin, and initialize Software Serial.
@@ -51,7 +56,10 @@ License MIT
   execute span point calibration.
   if you want to execute span point calibration, the MH-Z19 sensor must work in between 1000 to 2000ppm level co2 for over 20 minutes and you execute this function.
   
-* int getPPM()  
+* int getPPM(MHZ19_POTOCOL::UART)  
+  get co2 ppm.
+  
+* int getPPM(MHZ19_POTOCOL::PWM)  
   get co2 ppm.
   
 * int getTemperature()  
@@ -73,4 +81,55 @@ License MIT
 # history
 * ver. 0.1: closed version.
 * ver. 0.2: first release version.
-* ver. 0.3: support ESP-WROOM-32(ESP32), Change library name. (MHZ19_Serial -> MHZ19_uart)
+* ver. 0.3: support ESP-WROOM-32(ESP32)
+* ver. 0.4: Implementing PWM readings and refactor library use.
+
+# Example Code
+
+```
+#include <Arduino.h>
+#include "MHZ19.h"
+
+const int rx_pin = 13; //Serial rx pin no
+const int tx_pin = 15; //Serial tx pin no
+const int pwmpin = 14;
+MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
+MHZ19 *mhz19_pwm = new MHZ19(pwmpin);
+
+/*----------------------------------------------------------
+    MH-Z19 CO2 sensor  setup
+  ----------------------------------------------------------*/
+void setup()
+{
+    Serial.begin(115200);
+    mhz19_uart->begin(rx_pin, tx_pin);
+    mhz19_uart->setAutoCalibration(false);
+    while (mhz19_uart->isWarming())
+    {
+        Serial.print("MH-Z19 now warming up...  status:");
+        Serial.println(mhz19_uart->getStatus());
+        delay(1000);
+    }
+}
+
+/*----------------------------------------------------------
+    MH-Z19 CO2 sensor  loop
+  ----------------------------------------------------------*/
+void loop()
+{
+    int co2ppm = mhz19_uart->getPPM(MHZ19_POTOCOL::UART);
+    int temp = mhz19_uart->getTemperature();
+
+    Serial.print("co2: ");
+    Serial.println(co2ppm);
+    Serial.print("temp: ");
+    Serial.println(temp);
+
+    co2ppm = mhz19_pwm->getPPM(MHZ19_POTOCOL::PWM);
+    Serial.print("co2: ");
+    Serial.println(co2ppm);
+    
+
+    delay(5000);
+}
+```
