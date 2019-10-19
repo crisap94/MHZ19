@@ -65,34 +65,17 @@ void MHZ19::calibrateSpan(int ppm)
 	writeCommand(cmd);
 }
 
-int MHZ19::getPPM(MHZ19_POTOCOL protocol)
-{
-	int data;
-	switch (protocol)
-	{
-	case MHZ19_POTOCOL::UART:
-		data = getSerialData(MHZ19_UART_DATA::PPM);
-		break;
-	case MHZ19_POTOCOL::PWM:
-		data = getPwmData();
-		break;
-	}
-	return data;
-}
-
-int MHZ19::getTemperature()
-{
-	return getSerialData(MHZ19_UART_DATA::TEMPERATURE);
-}
-
+/* undocumented function */
 int MHZ19::getStatus()
 {
-	return getSerialData(MHZ19_UART_DATA::STAT);
+	measurement_t m = getMeasurement();
+	return m.state;
 }
 
+/* undocumented function, seems not to work with MH-Z19B */
 boolean MHZ19::isWarming()
 {
-	return (getStatus() <= 1);
+	return (getStatus()<= 1);
 }
 
 //protected
@@ -128,7 +111,7 @@ void MHZ19::writeCommand(uint8_t cmd[], uint8_t *response)
 
 //private
 
-int MHZ19::getSerialData(MHZ19_UART_DATA flg)
+measurement_t MHZ19::getMeasurement()
 {
 	uint8_t buf[MHZ19::RESPONSE_CNT];
 	for (int i = 0; i < MHZ19::RESPONSE_CNT; i++)
@@ -137,36 +120,22 @@ int MHZ19::getSerialData(MHZ19_UART_DATA flg)
 	}
 
 	writeCommand(getppm, buf);
-	int co2 = 0, co2temp = 0, co2status = 0;
-
 	// parse
+	measurement_t measurement = {};
 	if (buf[0] == 0xff && buf[1] == 0x86 && mhz19_checksum(buf) == buf[MHZ19::RESPONSE_CNT - 1])
 	{
-		co2 = buf[2] * 256 + buf[3];
-		co2temp = buf[4] - 40;
-		co2status = buf[5];
+		measurement.co2_ppm = buf[2] * 256 + buf[3];
+		measurement.temperature = buf[4] - 40;
+		measurement.state = buf[5];
 	}
 	else
 	{
-		co2 = co2temp = co2status = -1;
+		measurement.co2_ppm = measurement.temperature = measurement.state = -1;
 	}
-
-	switch (flg)
-	{
-	case MHZ19_UART_DATA::TEMPERATURE:
-		return co2temp;
-		break;
-	case MHZ19_UART_DATA::STAT:
-		return co2status;
-		break;
-	case MHZ19_UART_DATA::PPM:
-	default:
-		return co2;
-		break;
-	}
+	return measurement;
 }
 
-int MHZ19::getPwmData()
+int MHZ19::getPpmPwm()
 {
 	unsigned long th, tl, ppm = 0;
 

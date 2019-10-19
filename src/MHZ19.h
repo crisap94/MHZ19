@@ -30,6 +30,13 @@ enum MHZ19_POTOCOL
 	PWM
 };
 
+typedef struct measurement {
+	int co2_ppm;
+	int temperature;
+	int state;
+} measurement_t;
+
+
 class MHZ19
 {
   public:
@@ -43,10 +50,9 @@ class MHZ19
 	void setAutoCalibration(boolean autocalib);
 	void calibrateZero();
 	void calibrateSpan(int ppm);
-
-	int getPPM(MHZ19_POTOCOL protocol);
-	int getTemperature();
 	int getStatus();
+	measurement_t getMeasurement();
+	int getPpmPwm();
 
 	boolean isWarming();
 
@@ -56,8 +62,7 @@ class MHZ19
 
   private:
 	uint8_t mhz19_checksum(uint8_t com[]);
-	int getSerialData(MHZ19_UART_DATA flg);
-	int getPwmData();
+	measurement_t getSerialData();
 	void setPwmData(MHZ19_PWM_DATA type);
 
 	static const int REQUEST_CNT = 8;

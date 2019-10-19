@@ -2,14 +2,14 @@
     MH-Z19 CO2 sensor  Span calibration SAMPLE
   ----------------------------------------------------------*/
 
-#include <MHZ19_uart.h>
+#include <MHZ19.h>
 
 const int rx_pin = 4;  //Serial rx pin no
 const int tx_pin = 5;  //Serial tx pin no
 
 const int waitingMinutes = 30;  //waiting 30 minutes
 
-MHZ19_uart mhz19;
+MHZ19 mhz19(rx_pin,tx_pin); 
 
 /*----------------------------------------------------------
     MH-Z19 CO2 sensor  setup
@@ -58,7 +58,8 @@ void loop() {
     Serial.println("span calibration now .");
 
     for ( int i = 0; i < 10; i++) {
-      Serial.print("co2: "); Serial.print(mhz19.getPPM()); Serial.println("ppm now.");
+      measurement_t m = mhz19.getMeasurement();
+      Serial.print("co2: "); Serial.print(m.co2_ppm); Serial.println("ppm now.");
       delay(10000);
     }
     cnt = 0;

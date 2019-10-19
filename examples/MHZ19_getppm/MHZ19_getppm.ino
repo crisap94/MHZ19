@@ -33,19 +33,17 @@ void setup()
   ----------------------------------------------------------*/
 void loop()
 {
-    int co2ppm = mhz19_uart->getPPM(MHZ19_POTOCOL::UART);
-    int temp = mhz19_uart->getTemperature();
+    measurement_t m = mhz19_uart->getMeasurement();
 
     Serial.print("co2: ");
-    Serial.println(co2ppm);
+    Serial.println(m.co2_ppm);
     Serial.print("temp: ");
-    Serial.println(temp);
+    Serial.println(m.temperature);
 
-    co2ppm = mhz19_pwm->getPPM(MHZ19_POTOCOL::PWM);
+    int co2ppm = mhz19_pwm->getPpmPwm();
     Serial.print("co2: ");
     Serial.println(co2ppm);
     
-
     delay(5000);
 }
 
