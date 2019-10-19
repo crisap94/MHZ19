@@ -1,6 +1,8 @@
 # MHZ19 
 Arduino IDE library for operating the MH-Z19 CO2 sensor in ESP-WROOM-02/32(ESP8266/ESP32) or Arduino  
-version 0.3
+version 0.5
+
+Main work was done by crisap94
 
 # Credits and license  
 License MIT
@@ -23,14 +25,14 @@ License MIT
 
 * This library is testing only ESP-WROOM-02/32(ESP8266/ESP32) boards. if you can't execute this library on your arduino (or clone) boards, please contact me.
 
-* The Sensor through PWM can only implement getPPM(MHZ19_POTOCOL::PWM), so in order to use all the functionalities use UART protocol.
+* The Sensor through PWM can only implement getPpmPwm(), so in order to use all the functionalities use UART protocol.
 
 # MHZ19 library function
 
-## Constractor
+## Constructor
 
 * MHZ19  
-  normal constractor. if you use this constractor, you must execute begin() function after this constractor execute.
+  normal constractor. if you use this constractor, you must execute begin() function after this constractor.
 
 * MHZ19(int rx, int tx)  
   setting rx and tx pin, and initialize Software Serial.
@@ -56,20 +58,17 @@ License MIT
   execute span point calibration.
   if you want to execute span point calibration, the MH-Z19 sensor must work in between 1000 to 2000ppm level co2 for over 20 minutes and you execute this function.
   
-* int getPPM(MHZ19_POTOCOL::UART)  
-  get co2 ppm.
+* measurement_t getMeasurement()  
+  receive a struct with members co2_ppm, temperature (MH-Z19 hidden function? not mentioned in the datasheet) and state (same as temperature, but seems not to be present in MH-Z19B). If the sensor is connected state = 0.
   
-* int getPPM(MHZ19_POTOCOL::PWM)  
+* int getPpmPwm()  
   get co2 ppm.
-  
-* int getTemperature()  
-  get temperature (MH-Z19 hidden function?  this function is not support.)
 
 * int getStatus()  
-  get ths MH-Z19 sensor status value (but I don't know what this value is. this function do not support, too.)
+  get ths MH-Z19 sensor status value (MH-Z19 hidden function? not mentioned in the datasheet)
 
 * bool isWarming()  
-  check the MH-Z19 sensor is warming up.
+  check the MH-Z19 sensor is warming up. (MH-Z19 hidden function? not mentioned in the datasheet, but seems not to be present in MH-Z19B)
 
 # link
 * MH-Z19 Data sheet  
@@ -77,24 +76,35 @@ License MIT
 
 * MH-Z19B Data sheet  
   http://www.winsen-sensor.com/d/files/infrared-gas-sensor/mh-z19b-co2-ver1_0.pdf
+  
 * A newer datasheet is available here
   https://www.winsen-sensor.com/d/files/MH-Z19B.pdf
 
 # history
-* ver. 0.1: closed version.
-* ver. 0.2: first release version.
-* ver. 0.3: support ESP-WROOM-32(ESP32)
-* ver. 0.4: Implementing PWM readings and refactor library use.
+* ver. 0.1: closed version. - crisap94
+* ver. 0.2: first release version. - crisap94
+* ver. 0.3: support ESP-WROOM-32(ESP32) - crisap94
+* ver. 0.4: Implementing PWM readings and refactor library use. - crisap94
+* ver. 0.5: Refactored library to take advantage of all uart measurements per read
+
+# todo
+
+* SoftwareSerial uart communication is not always working well in version 0.4 and 0.5. Potentially due to instantiating it only when it is needed.
 
 # Example Code
 
 ```
-#include <Arduino.h>
+/*----------------------------------------------------------
+    MH-Z19 CO2 sensor  SAMPLE
+  ----------------------------------------------------------*/
+
 #include "MHZ19.h"
 
 const int rx_pin = 13; //Serial rx pin no
 const int tx_pin = 15; //Serial tx pin no
+
 const int pwmpin = 14;
+
 MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
 MHZ19 *mhz19_pwm = new MHZ19(pwmpin);
 
@@ -119,19 +129,17 @@ void setup()
   ----------------------------------------------------------*/
 void loop()
 {
-    int co2ppm = mhz19_uart->getPPM(MHZ19_POTOCOL::UART);
-    int temp = mhz19_uart->getTemperature();
+    measurement_t m = mhz19_uart->getMeasurement();
 
     Serial.print("co2: ");
-    Serial.println(co2ppm);
+    Serial.println(m.co2_ppm);
     Serial.print("temp: ");
-    Serial.println(temp);
+    Serial.println(m.temperature);
 
-    co2ppm = mhz19_pwm->getPPM(MHZ19_POTOCOL::PWM);
+    int co2ppm = mhz19_pwm->getPpmPwm();
     Serial.print("co2: ");
     Serial.println(co2ppm);
     
-
     delay(5000);
 }
 ```
