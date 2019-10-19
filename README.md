@@ -1,5 +1,5 @@
-# MHZ19 
-Arduino IDE library for operating the MH-Z19 CO2 sensor in ESP-WROOM-02/32(ESP8266/ESP32) or Arduino  
+# MHZ19
+Arduino IDE library for operating the MH-Z19 and MH-Z19B CO2 sensor in ESP-WROOM-02/32(ESP8266/ESP32) or Arduino  
 version 0.5
 
 Main work was done by crisap94
