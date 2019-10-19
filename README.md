@@ -85,7 +85,7 @@ License MIT
 * ver. 0.2: first release version. - crisap94
 * ver. 0.3: support ESP-WROOM-32(ESP32) - crisap94
 * ver. 0.4: Implementing PWM readings and refactor library use. - crisap94
-* ver. 0.5: Refactored library to take advantage of all uart measurements per read
+* ver. 0.5: Refactored library to take advantage of all uart measurements per read - sebastianbergt
 
 # todo
 
