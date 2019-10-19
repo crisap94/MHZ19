@@ -77,6 +77,8 @@ License MIT
 
 * MH-Z19B Data sheet  
   http://www.winsen-sensor.com/d/files/infrared-gas-sensor/mh-z19b-co2-ver1_0.pdf
+* A newer datasheet is available here
+  https://www.winsen-sensor.com/d/files/MH-Z19B.pdf
 
 # history
 * ver. 0.1: closed version.
