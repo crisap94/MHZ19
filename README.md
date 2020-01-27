@@ -33,7 +33,7 @@ License MIT
 ## Constructor
 
 * MHZ19  
-  normal constractor. if you use this constractor, you must execute begin() function after this constractor.
+  normal constructor. if you use this constructor, you must execute begin() function after this constructor.
 
 * MHZ19(int rx, int tx)  
   setting rx and tx pin, and initialize Software Serial.
