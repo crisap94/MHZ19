@@ -94,7 +94,7 @@ License MIT
 
 # Example Code
 
-```
+```c++
 /*----------------------------------------------------------
     MH-Z19 CO2 sensor  SAMPLE
   ----------------------------------------------------------*/
@@ -117,12 +117,10 @@ void setup()
     Serial.begin(115200);
     mhz19_uart->begin(rx_pin, tx_pin);
     mhz19_uart->setAutoCalibration(false);
-    while (mhz19_uart->isWarming())
-    {
-        Serial.print("MH-Z19 now warming up...  status:");
-        Serial.println(mhz19_uart->getStatus());
-        delay(1000);
-    }
+    delay(3000); // Issue #14
+    Serial.print("MH-Z19 now warming up...  status:");
+    Serial.println(mhz19_uart->getStatus());
+    delay(1000);
 }
 
 /*----------------------------------------------------------
