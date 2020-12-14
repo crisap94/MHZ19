@@ -20,7 +20,7 @@ void setup()
     Serial.begin(115200);
     mhz19_uart->begin(rx_pin, tx_pin);
     mhz19_uart->setAutoCalibration(false);
-    delay(3000)
+    delay(3000);
     Serial.print("MH-Z19 now warming up...  status:");
     Serial.println(mhz19_uart->getStatus());
     delay(1000);
